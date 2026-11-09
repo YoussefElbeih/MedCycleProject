@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedCycle Enterprise - منصة اللوجستيات العكسية للأدوية ومتجر المكافآت</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        teal: { 600: '#0d9488', 700: '#0f766e', 800: '#115e59' },
+                        slate: { 50: '#f8fafc', 100: '#f1f5f9', 800: '#1e293b', 900: '#0f172a' }
+                    },
+                    fontFamily: { sans: ['Tajawal', 'Arial', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts: Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- html5-qrcode -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #f8fafc; }
+        .swal2-container { font-family: 'Tajawal', sans-serif; z-index: 9999; }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .flat-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        #reader video {
+            object-fit: cover !important;
+            border-radius: 0.375rem;
+        }
+
+        .reward-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .reward-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased flex h-screen overflow-hidden">
+
+    <!-- Sidebar (Desktop) -->
+    <aside class="w-64 bg-slate-900 text-white flex flex-col hidden md:flex z-20 border-l border-slate-800">
+        <div class="h-16 flex items-center justify-between px-6 border-b border-slate-800">
+            <div class="flex items-center space-x-2 space-x-reverse">
+                <i class="fa-solid fa-recycle text-teal-500 text-2xl"></i>
+                <h1 class="text-xl font-bold tracking-wide">Med<span class="text-teal-500">Cycle</span></h1>
+            </div>
+            <span class="text-[10px] font-mono bg-teal-950 text-teal-400 px-2 py-0.5 rounded border border-teal-800">v2026</span>
+        </div>
+        
+        <!-- Supervisor Profile Banner -->
+        <div class="p-5 border-b border-slate-800 bg-slate-900/60">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="w-12 h-12 rounded-lg bg-teal-600 flex items-center justify-center text-white font-black text-xl shadow-inner border border-teal-400/30">
+                    Y
+                </div>
+                <div>
+                    <span class="text-[11px] text-slate-400 block font-semibold">المشرف المسؤول</span>
+                    <h2 class="text-base font-extrabold text-white tracking-wide">YOUSSEF</h2>
+                    <span class="inline-flex items-center text-[10px] text-teal-400 bg-teal-950 px-2 py-0.5 rounded mt-1 border border-teal-800">
+                        <span class="w-1.5 h-1.5 rounded-full bg-teal-400 ml-1 animate-pulse"></span> مدير النظام
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Sidebar -->
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+            <a href="#dashboard" class="flex items-center px-4 py-3 bg-teal-700 text-white rounded-md font-bold text-sm transition shadow-sm">
+                <i class="fa-solid fa-gauge-high w-6 text-teal-200"></i> لوحة القيادة
+            </a>
+            <a href="#store-section" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-md font-medium text-sm transition">
+                <i class="fa-solid fa-gift w-6 text-amber-400"></i> متجر المكافآت
+            </a>
+            <a href="#scanner-section" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-md font-medium text-sm transition">
+                <i class="fa-solid fa-barcode w-6 text-slate-400"></i> ماسح الأدوية
+            </a>
+            <a href="#history-section" class="flex items-center px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-md font-medium text-sm transition">
+                <i class="fa-solid fa-clock-rotate-left w-6 text-slate-400"></i> سجل العمليات
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-slate-800 text-[11px] text-slate-400 text-center leading-relaxed">
+            منصة MedCycle الرقمية المتقدمة<br>إدارات اللوجستيات العكسية © 2026
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-slate-100 relative">
+        
+        <!-- Header Bar -->
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-10 shadow-sm">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="md:hidden flex items-center">
+                    <i class="fa-solid fa-recycle text-teal-600 text-xl ml-2"></i>
+                    <span class="font-bold text-slate-900">MedCycle</span>
+                </div>
+                <div class="hidden md:flex items-center text-slate-700 font-bold text-sm">
+                    <i class="fa-solid fa-layer-group text-teal-600 ml-2"></i>
+                    <span>نظام الحوكمة وإعادة تدوير الأدوية - المعالجة الرقمية</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="flex items-center bg-amber-50 border border-amber-200 pl-2 pr-3 py-1 rounded-md">
+                    <i class="fa-solid fa-coins text-amber-500 ml-2 text-sm animate-bounce"></i>
+                    <div class="ml-3">
+                        <span class="text-[10px] text-amber-700 font-bold block leading-none">رصيد النقاط المتاح</span>
+                        <span class="text-sm font-black text-amber-900" id="headerPointsCounter">0</span> <span class="text-[10px] text-amber-700 font-bold">نقطة</span>
+                    </div>
+                    <button onclick="openRewardsStoreModal()" class="mr-3 bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1 rounded text-xs transition flex items-center shadow-sm">
+                        <i class="fa-solid fa-store ml-1"></i> المتجر 🎁
+                    </button>
+                </div>
+
+                <div class="hidden lg:flex items-center bg-teal-50 border border-teal-200 px-3 py-1.5 rounded-md text-xs font-medium text-teal-800">
+                    <span class="w-2 h-2 rounded-full bg-teal-500 ml-2 animate-ping"></span>
+                    <span id="dbCountStatus">جاري تحميل 5,000 دواء...</span>
+                </div>
+
+                <button onclick="resetSystemData()" class="px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 rounded-md text-xs font-bold transition flex items-center">
+                    <i class="fa-solid fa-rotate-right ml-1"></i> تصفير البيانات
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Container -->
+        <div class="p-6 space-y-6 max-w-7xl mx-auto w-full" id="dashboard">
+            
+            <!-- Statistics Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="flat-card p-4 border-r-4 border-r-teal-600">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs text-slate-500 font-bold mb-1">إجمالي الأدوية المعالجة</p>
+                            <h3 class="text-2xl font-black text-slate-800" id="statTotalProcessed">0</h3>
+                        </div>
+                        <div class="p-2.5 bg-teal-50 text-teal-600 rounded-md">
+                            <i class="fa-solid fa-boxes-stacked text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flat-card p-4 border-r-4 border-r-amber-500">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs text-slate-500 font-bold mb-1">النقاط المتاحة للاستبدال</p>
+                            <h3 class="text-2xl font-black text-amber-600" id="statAvailablePoints">0</h3>
+                            <span class="text-[10px] text-slate-400 font-bold">إجمالي المكتسب: <span id="statPointsEarned">0</span></span>
+                        </div>
+                        <div class="p-2.5 bg-amber-50 text-amber-600 rounded-md">
+                            <i class="fa-solid fa-gift text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flat-card p-4 border-r-4 border-r-blue-600">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs text-slate-500 font-bold mb-1">مواد فعالة مسترجعة (API)</p>
+                            <h3 class="text-2xl font-black text-slate-800"><span id="statApiReclaimed">0</span> <span class="text-xs text-slate-500 font-normal">جم</span></h3>
+                        </div>
+                        <div class="p-2.5 bg-blue-50 text-blue-600 rounded-md">
+                            <i class="fa-solid fa-vial-circle-check text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flat-card p-4 border-r-4 border-r-purple-600">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs text-slate-500 font-bold mb-1">عبوات وبلاستيك مُعاد تدويره</p>
+                            <h3 class="text-2xl font-black text-slate-800"><span id="statPackagingRecycled">0</span> <span class="text-xs text-slate-500 font-normal">جم</span></h3>
+                        </div>
+                        <div class="p-2.5 bg-purple-50 text-purple-600 rounded-md">
+                            <i class="fa-solid fa-recycle text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DEDICATED REWARDS & COUPONS STORE SECTION -->
+            <div class="flat-card p-5 border-t-4 border-t-amber-500" id="store-section">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-4 mb-4 gap-2">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-lg flex items-center">
+                            <i class="fa-solid fa-store ml-2 text-amber-500"></i> متجر استبدال النقاط والكوبونات
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">استبدل نقاطك المكتسبة من إعادة تدوير الأدوية بكوبونات خصم وقسائم علاجية معتمدة</p>
+                    </div>
+                    <div class="flex items-center bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-md text-xs font-bold text-amber-900">
+                        <span>رصيدك الحالي:</span>
+                        <span class="font-black text-sm text-amber-600 mx-1" id="storeSectionPoints">0</span>
+                        <span>نقطة</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="rewardsGrid">
+                </div>
+            </div>
+
+            <!-- Scanner & Manual Input Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" id="scanner-section">
+                
+                <div class="lg:col-span-1 space-y-4">
+                    
+                    <div class="flat-card p-5">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4">
+                            <h3 class="font-bold text-slate-800 text-base">
+                                <i class="fa-solid fa-camera ml-2 text-teal-600"></i> ماسح الكاميرا الضوئي
+                            </h3>
+                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">Html5Qrcode</span>
+                        </div>
+
+                        <div id="reader" class="w-full bg-slate-900 rounded-md border border-slate-300 min-h-[220px] flex flex-col items-center justify-center overflow-hidden mb-4 relative">
+                            <i class="fa-solid fa-barcode text-5xl text-slate-600 mb-2"></i>
+                            <p class="text-slate-400 text-xs font-medium">الكاميرا متوقفة حالياً</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="btnStartScan" onclick="startCameraScanner()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-3 rounded text-sm transition flex items-center justify-center">
+                                <i class="fa-solid fa-play ml-2"></i> تشغيل الكاميرا
+                            </button>
+                            <button id="btnStopScan" onclick="stopCameraScanner()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-2.5 px-3 rounded text-sm transition flex items-center justify-center opacity-50 cursor-not-allowed" disabled>
+                                <i class="fa-solid fa-stop ml-2"></i> إيقاف الكاميرا
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flat-card p-5">
+                        <div class="border-b border-slate-200 pb-3 mb-4">
+                            <h3 class="font-bold text-slate-800 text-base">
+                                <i class="fa-solid fa-keyboard ml-2 text-teal-600"></i> البحث والإدخال اليدوي
+                            </h3>
+                        </div>
+
+                        <form onsubmit="handleManualSubmit(event)" class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">أدخل رقم الباركود أو اسم الدواء</label>
+                                <div class="relative">
+                                    <input type="text" id="manualInput" oninput="toggleClearBtn()" list="medicineDatalist" autocomplete="off" placeholder="مثال: 622100... أو Panadol" class="w-full border border-slate-300 rounded pl-8 pr-3 py-2.5 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition font-mono" dir="ltr">
+                                    
+                                    <button type="button" id="btnClearManualInput" onclick="clearManualInput()" class="hidden absolute left-2.5 top-2.5 text-slate-400 hover:text-red-600 p-0.5 rounded-full text-sm transition" title="مسح الاختيار والتراجع">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                    
+                                    <datalist id="medicineDatalist"></datalist>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded text-sm transition flex items-center justify-center">
+                                <i class="fa-solid fa-magnifying-glass ml-2"></i> معالجة الفحص
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
+                        <div class="flat-card p-4 flex flex-col min-h-[320px]">
+                            <h4 class="font-bold text-slate-800 text-sm border-b border-slate-200 pb-2 mb-3">
+                                <i class="fa-solid fa-chart-pie ml-2 text-teal-600"></i> توجيه مسارات الأدوية
+                            </h4>
+                            <div class="flex-1 relative w-full flex justify-center items-center">
+                                <canvas id="chartRoutes"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="flat-card p-4 flex flex-col min-h-[320px]">
+                            <h4 class="font-bold text-slate-800 text-sm border-b border-slate-200 pb-2 mb-3">
+                                <i class="fa-solid fa-chart-bar ml-2 text-teal-600"></i> توزيع حالات الأدوية
+                            </h4>
+                            <div class="flex-1 relative w-full flex justify-center items-center">
+                                <canvas id="chartConditions"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flat-card p-5" id="history-section">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-4 mb-4 gap-3">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-lg">
+                            <i class="fa-solid fa-table-list ml-2 text-teal-600"></i> سجل معالجة الأدوية واللوجستيات
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">توثيق العمليات والمحطات العكسية المسجلة بالتاريخ والوقت</p>
+                    </div>
+
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <div class="relative w-full sm:w-64">
+                            <input type="text" id="tableSearchInput" onkeyup="filterLogTable()" placeholder="بحث في السجل..." class="w-full border border-slate-300 rounded pr-8 pl-3 py-1.5 text-xs focus:ring-2 focus:ring-teal-500 outline-none">
+                            <i class="fa-solid fa-search absolute right-2.5 top-2.5 text-slate-400 text-xs"></i>
+                        </div>
+                        <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded text-xs transition flex items-center whitespace-nowrap">
+                            <i class="fa-solid fa-file-csv ml-1.5"></i> تصدير CSV
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-200 rounded">
+                    <table class="w-full text-right border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-700 border-b border-slate-200 font-bold">
+                                <th class="p-3">رقم الشحنة</th>
+                                <th class="p-3">التاريخ والوقت</th>
+                                <th class="p-3">الباركود</th>
+                                <th class="p-3">اسم الدواء والمادة الفعالة</th>
+                                <th class="p-3">نوع العبوة</th>
+                                <th class="p-3">الحالة المطلوبة</th>
+                                <th class="p-3">المسار العكسي</th>
+                                <th class="p-3">المكافأة والأثر</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logTableBody" class="divide-y divide-slate-200 bg-white">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-between mt-4 pt-3 border-t border-slate-100 text-xs gap-2">
+                    <span id="pageInfoText" class="text-slate-600 font-bold">عرض 0 من 0</span>
+                    <div class="flex space-x-1 space-x-reverse">
+                        <button id="btnPrevPage" onclick="changePage(-1)" class="px-3 py-1 bg-slate-100 border border-slate-300 rounded hover:bg-slate-200 font-bold disabled:opacity-50">السابق</button>
+                        <button id="btnNextPage" onclick="changePage(1)" class="px-3 py-1 bg-slate-100 border border-slate-300 rounded hover:bg-slate-200 font-bold disabled:opacity-50">التالي</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const REWARDS_CATALOG = [
+            {
+                id: 'rw-1',
+                title: 'خصم 20% في صيدليات العزبي والطرشوبي',
+                cost: 100,
+                category: 'خصومات صيدليات',
+                icon: 'fa-prescription-bottle-medical',
+                color: 'bg-emerald-500',
+                desc: 'كوبون خصم ساري على كافة الأدوية والمستلزمات غير الخاضعة للتسعير الإجباري.'
+            },
+            {
+                id: 'rw-2',
+                title: 'خصم 50 ج.م على المستلزمات الطبية',
+                cost: 150,
+                category: 'مستلزمات',
+                icon: 'fa-kit-medical',
+                color: 'bg-teal-600',
+                desc: 'قسيمة خصم مباشر عند شراء جهاز قياس الضغط، السكر، أو مستلزمات الإسعافات.'
+            },
+            {
+                id: 'rw-3',
+                title: 'خصم 30% على منتجات العناية بالبشرة',
+                cost: 200,
+                category: 'عناية بشرة',
+                icon: 'fa-pump-soap',
+                color: 'bg-purple-600',
+                desc: 'قسيمة خصم ممتازة لمنتجات العناية بالشعر والبشرة والواقيات الشمسية.'
+            },
+            {
+                id: 'rw-4',
+                title: 'قسيمة فحص واستشارة طبية مجانية',
+                cost: 250,
+                category: 'استشارات',
+                icon: 'fa-user-doctor',
+                color: 'bg-blue-600',
+                desc: 'كوبون كشف وتأمين طبي شامل في المراكز والعيادات الشريكة للمنصة.'
+            }
+        ];
+
+        const medicineMap = new Map();
+        const PACKAGING_TYPES = ['شريط حبوب', 'زجاجة شراب', 'أنبوبة مرهم', 'بخاخ طبي', 'حقنة معقمة'];
+        const CATEGORIES = ['مسكنات ومضادات التهاب', 'مضادات حيوية', 'أدوية جهاز تنفسي', 'أدوية جهاز هضمي', 'أدوية قلب وضغط', 'فيتامينات ومكملات'];
+
+        function generateDatabase() {
+            const prefixes = ['Panadol', 'Augmentin', 'Brufen', 'Cataflam', 'Ketofan', 'Congestal', 'Omepak', 'Nexium', 'Amoxicillin', 'Ciprofar', 'Zithro', 'Concor', 'Glucophage', 'Eltroxin', 'Voltaren', 'Antinal', 'Flagyl', 'Motilium', 'Controloc', 'Aspirin', 'Lasix', 'Plavix', 'Lipitor', 'Ventolin', 'Symbicort'];
+            const activeIngredients = ['Paracetamol', 'Amoxicillin / Clavulanate', 'Ibuprofen', 'Diclofenac Potassium', 'Ketoprofen', 'Paracetamol / Pseudoephedrine', 'Omeprazole', 'Esomeprazole', 'Ciprofloxacin', 'Azithromycin', 'Bisoprolol', 'Metformin', 'Levothyroxine', 'Nifuroxazide', 'Metronidazole', 'Domperidone', 'Atorvastatin', 'Salbutamol'];
+            const forms = ['Tablet', 'Capsule', 'Syrup', 'Injection', 'Cream', 'Ointment', 'Drops', 'Spray', 'Suspension'];
+            const strengths = ['10mg', '20mg', '50mg', '100mg', '200mg', '250mg', '500mg', '625mg', '1000mg'];
+            const manufacturers = ['Eva Pharma', 'Amoun', 'EIPICO', 'Pharco', 'SEDICO', 'Pfizer Egypt', 'Novartis', 'GSK', 'Sanofi', 'Marcyrl'];
+
+            let seed = 987654;
+            function pseudoRandom() {
+                let x = Math.sin(seed++) * 10000;
+                return x - Math.floor(x);
+            }
+
+            for (let i = 0; i < 5000; i++) {
+                let rawDigits = '622' + String(Math.floor(pseudoRandom() * 1000000000)).padStart(9, '0');
+                
+                let sumOdd = 0, sumEven = 0;
+                for (let j = 0; j < 12; j++) {
+                    let d = parseInt(rawDigits[j]);
+                    if (j % 2 === 0) sumOdd += d;
+                    else sumEven += d * 3;
+                }
+                let checkDigit = (10 - ((sumOdd + sumEven) % 10)) % 10;
+                let fullBarcode = rawDigits + checkDigit;
+
+                while (medicineMap.has(fullBarcode)) {
+                    fullBarcode = (BigInt(fullBarcode) + 1n).toString();
+                }
+
+                let pName = prefixes[Math.floor(pseudoRandom() * prefixes.length)];
+                let pForm = forms[Math.floor(pseudoRandom() * forms.length)];
+                let pStrength = strengths[Math.floor(pseudoRandom() * strengths.length)];
+                let pActive = activeIngredients[Math.floor(pseudoRandom() * activeIngredients.length)];
+                let pCategory = CATEGORIES[Math.floor(pseudoRandom() * CATEGORIES.length)];
+                let pPkg = PACKAGING_TYPES[Math.floor(pseudoRandom() * PACKAGING_TYPES.length)];
+                let pMfr = manufacturers[Math.floor(pseudoRandom() * manufacturers.length)];
+
+                medicineMap.set(fullBarcode, {
+                    barcode: fullBarcode,
+                    name: `${pName} ${pStrength} (${pForm})`,
+                    activeIngredient: pActive,
+                    category: pCategory,
+                    packagingType: pPkg,
+                    manufacturer: pMfr
+                });
+            }
+
+            document.getElementById('dbCountStatus').innerHTML = `قاعدة البيانات جاهزة: <strong>5,000 دواء</strong>`;
+            populateDatalist();
+        }
+
+        function populateDatalist() {
+            const datalist = document.getElementById('medicineDatalist');
+            let count = 0;
+            let optionsHtml = '';
+            for (let [barcode, data] of medicineMap.entries()) {
+                if (count++ >= 250) break;
+                optionsHtml += `<option value="${barcode}">${data.name} - ${data.packagingType}</option>`;
+            }
+            datalist.innerHTML = optionsHtml;
+        }
+
+        const STORAGE_KEY = 'medcycle_enterprise_final_v2026';
+        let appState = {
+            logs: [],
+            redeemedVouchers: [],
+            stats: {
+                totalProcessed: 0,
+                pointsEarned: 0,
+                pointsSpent: 0,
+                apiReclaimedGrams: 0,
+                packagingRecycledGrams: 0
+            }
+        };
+
+        function loadSavedState() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    appState = Object.assign(appState, parsed);
+                    if (!appState.stats.pointsSpent) appState.stats.pointsSpent = 0;
+                } catch (e) {
+                    console.error("State parse error:", e);
+                }
+            }
+        }
+
+        function saveAppState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+            renderUI();
+        }
+
+        function getAvailablePoints() {
+            return Math.max(0, appState.stats.pointsEarned - (appState.stats.pointsSpent || 0));
+        }
+
+        function resetSystemData() {
+            Swal.fire({
+                title: 'تأكيد تصفير البيانات',
+                text: "أنت على وشك مسح كافة السجلات والإحصائيات والنقاط المخزنة بالمستعرض. هل تريد المتابعة؟",
+                icon: 'warning',
+                showCancelButton: true,
+                showCloseButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#334155',
+                confirmButtonText: 'نعم، قم بالمسح',
+                cancelButtonText: 'إلغاء'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    appState = {
+                        logs: [],
+                        redeemedVouchers: [],
+                        stats: { totalProcessed: 0, pointsEarned: 0, pointsSpent: 0, apiReclaimedGrams: 0, packagingRecycledGrams: 0 }
+                    };
+                    saveAppState();
+                    Swal.fire('تم المسح', 'تم تصفير لوحة البيانات والنقاط بنجاح.', 'success');
+                }
+            });
+        }
+
+        function renderRewardsGrid() {
+            const container = document.getElementById('rewardsGrid');
+            if (!container) return;
+
+            const availPoints = getAvailablePoints();
+            document.getElementById('storeSectionPoints').innerText = availPoints.toLocaleString('ar-EG');
+            document.getElementById('headerPointsCounter').innerText = availPoints.toLocaleString('ar-EG');
+            document.getElementById('statAvailablePoints').innerText = availPoints.toLocaleString('ar-EG');
+
+            let html = '';
+            REWARDS_CATALOG.forEach(item => {
+                const canAfford = availPoints >= item.cost;
+                html += `
+                    <div class="flat-card p-4 flex flex-col justify-between reward-card border ${canAfford ? 'border-amber-200 bg-white' : 'border-slate-200 bg-slate-50/70'}">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded ${item.color} text-white">${item.category}</span>
+                                <span class="font-black text-amber-600 text-xs flex items-center bg-amber-50 px-2 py-1 rounded border border-amber-200">
+                                    <i class="fa-solid fa-coins ml-1"></i> ${item.cost} نقطة
+                                </span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-sm mb-1">${item.title}</h4>
+                            <p class="text-[11px] text-slate-500 leading-relaxed mb-4">${item.desc}</p>
+                        </div>
+
+                        <button onclick="redeemRewardItem('${item.id}')" class="w-full font-bold py-2 px-3 rounded text-xs transition flex items-center justify-center ${canAfford ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-sm' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}">
+                            <i class="fa-solid fa-ticket ml-1.5"></i> ${canAfford ? 'استبدال الآن' : 'نقاط غير كافية'}
+                        </button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function redeemRewardItem(rewardId) {
+            const item = REWARDS_CATALOG.find(r => r.id === rewardId);
+            if (!item) return;
+
+            const currentPoints = getAvailablePoints();
+            if (currentPoints < item.cost) {
+                return Swal.fire({
+                    title: 'عفواً، رصيد النقاط غير كافٍ',
+                    html: `تحتاج إلى <b>${item.cost - currentPoints}</b> نقطة إضافية لاستبدال هذه المكافأة.<br>قم بمسح وتدوير المزيد من الأدوية لكسب النقاط!`,
+                    icon: 'warning',
+                    confirmButtonColor: '#f59e0b',
+                    showCloseButton: true
+                });
+            }
+
+            const promoCode = 'MED-' + Math.floor(1000 + Math.random() * 9000) + '-SAVE';
+
+            Swal.fire({
+                title: 'تأكيد استبدال الكوبون',
+                showCloseButton: true,
+                html: `
+                    <div class="text-right text-xs space-y-3 font-sans">
+                        <p class="text-slate-600">هل ترغب في استبدال <b>${item.cost} نقطة</b> بالحصول على الكوبون التالي؟</p>
+                        <div class="bg-amber-50 border border-amber-300 p-3 rounded text-center">
+                            <h4 class="font-extrabold text-amber-900 text-sm mb-1">${item.title}</h4>
+                            <span class="text-[11px] text-amber-700">${item.desc}</span>
+                        </div>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'تأكيد الخصم والاستبدال',
+                cancelButtonText: 'إلغاء',
+                confirmButtonColor: '#f59e0b',
+                cancelButtonColor: '#64748b'
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    appState.stats.pointsSpent += item.cost;
+                    appState.redeemedVouchers.push({
+                        id: promoCode,
+                        title: item.title,
+                        cost: item.cost,
+                        date: new Date().toLocaleString('ar-EG')
+                    });
+                    saveAppState();
+
+                    Swal.fire({
+                        title: '🎉 مبروك! تم استبدال الكوبون بنجاح',
+                        showCloseButton: true,
+                        html: `
+                            <div class="text-center space-y-3 font-sans">
+                                <p class="text-xs text-slate-600">تم خصم ${item.cost} نقطة من رصيدك. كود الخصم الخاص بك هو:</p>
+                                <div class="bg-slate-900 text-amber-400 font-mono text-lg font-black tracking-widest p-3 rounded border border-slate-700 select-all" id="promoCodeVal">
+                                    ${promoCode}
+                                </div>
+                                <button onclick="copyCodeToClipboard('${promoCode}')" class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold py-2 px-4 rounded transition inline-flex items-center">
+                                    <i class="fa-solid fa-copy ml-1.5"></i> نسخ كود الخصم
+                                </button>
+                                <p class="text-[10px] text-slate-400">يمكنك تقديم هذا الكود في أي صيدلية أو مركز طبي شريك للاستفادة بالخصم.</p>
+                            </div>
+                        `,
+                        icon: 'success',
+                        confirmButtonColor: '#0f766e',
+                        confirmButtonText: 'تم'
+                    });
+                }
+            });
+        }
+
+        function copyCodeToClipboard(codeText) {
+            try {
+                const dummy = document.createElement('textarea');
+                document.body.appendChild(dummy);
+                dummy.value = codeText;
+                dummy.select();
+                document.execCommand('copy');
+                document.body.removeChild(dummy);
+
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'تم نسخ كود الكوبون!',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } catch (e) {
+                console.error("Copy failed", e);
+            }
+        }
+
+        function openRewardsStoreModal() {
+            const availPoints = getAvailablePoints();
+            let itemsHtml = '';
+
+            REWARDS_CATALOG.forEach(item => {
+                const canAfford = availPoints >= item.cost;
+                itemsHtml += `
+                    <div class="border rounded p-3 text-right bg-white flex items-center justify-between gap-2 shadow-sm">
+                        <div>
+                            <div class="flex items-center space-x-2 space-x-reverse mb-1">
+                                <span class="font-bold text-slate-800 text-xs">${item.title}</span>
+                                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${item.color} text-white">${item.category}</span>
+                            </div>
+                            <p class="text-[10px] text-slate-500">${item.desc}</p>
+                        </div>
+                        <button onclick="Swal.close(); setTimeout(() => redeemRewardItem('${item.id}'), 200);" class="font-bold py-1.5 px-3 rounded text-xs whitespace-nowrap transition ${canAfford ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}">
+                            <i class="fa-solid fa-coins ml-1"></i> ${item.cost} نقطة
+                        </button>
+                    </div>
+                `;
+            });
+
+            Swal.fire({
+                title: '<i class="fa-solid fa-gift text-amber-500 ml-1"></i> متجر قسائم ومكافآت MedCycle',
+                showCloseButton: true,
+                width: '650px',
+                html: `
+                    <div class="text-right space-y-3 font-sans">
+                        <div class="flex items-center justify-between bg-amber-50 p-2.5 rounded border border-amber-200 text-xs text-amber-900 font-bold">
+                            <span>رصيد نقاطك المتاح حالياً:</span>
+                            <span class="text-sm font-black text-amber-600">${availPoints} نقطة</span>
+                        </div>
+                        <div class="space-y-2 max-h-[350px] overflow-y-auto pr-1">
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                `,
+                showConfirmButton: false
+            });
+        }
+
+        let html5QrScanner = null;
+
+        async function startCameraScanner() {
+            const btnStart = document.getElementById('btnStartScan');
+            const btnStop = document.getElementById('btnStopScan');
+
+            try {
+                if (!window.isSecureContext && location.hostname !== 'localhost') {
+                    throw new Error("تتطلب الكاميرا اتصالاً آمناً (HTTPS).");
+                }
+                const devices = await Html5Qrcode.getCameras();
+                if (!devices || devices.length === 0) {
+                    throw new Error("لم يتم العثور على كاميرا موصولة للجهاز.");
+                }
+            } catch (err) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'خطأ بالكاميرا',
+                    text: err.message || 'تعذر تشغيل الكاميرا. يرجى السماح بالصلاحيات اللازمة.',
+                    confirmButtonColor: '#0f766e',
+                    showCloseButton: true
+                });
+                return;
+            }
+
+            if (!html5QrScanner) {
+                html5QrScanner = new Html5Qrcode("reader");
+            }
+
+            btnStart.disabled = true;
+            btnStart.classList.add('opacity-50');
+
+            html5QrScanner.start(
+                { facingMode: "environment" },
+                { fps: 15, qrbox: { width: 240, height: 110 } },
+                (decodedText) => {
+                    playAudioBeep();
+                    stopCameraScanner();
+                    processScannedMedicine(decodedText);
+                },
+                (errorMessage) => { }
+            ).then(() => {
+                btnStop.disabled = false;
+                btnStop.classList.remove('opacity-50', 'cursor-not-allowed');
+            }).catch(err => {
+                btnStart.disabled = false;
+                btnStart.classList.remove('opacity-50');
+                Swal.fire({ title: 'خطأ', text: 'فشل بدء الكاميرا: ' + err, icon: 'error', showCloseButton: true });
+            });
+        }
+
+        function stopCameraScanner() {
+            if (html5QrScanner && html5QrScanner.isScanning) {
+                html5QrScanner.stop().then(() => {
+                    document.getElementById('btnStartScan').disabled = false;
+                    document.getElementById('btnStartScan').classList.remove('opacity-50');
+                    
+                    const btnStop = document.getElementById('btnStopScan');
+                    btnStop.disabled = true;
+                    btnStop.classList.add('opacity-50', 'cursor-not-allowed');
+                }).catch(console.error);
+            }
+        }
+
+        function playAudioBeep() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, ctx.currentTime);
+                osc.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.12);
+            } catch (e) {}
+        }
+
+        function toggleClearBtn() {
+            const input = document.getElementById('manualInput');
+            const btn = document.getElementById('btnClearManualInput');
+            if (input && btn) {
+                if (input.value.trim().length > 0) {
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            }
+        }
+
+        function clearManualInput() {
+            const input = document.getElementById('manualInput');
+            if (input) {
+                input.value = '';
+                toggleClearBtn();
+                input.focus();
+            }
+        }
+
+        function handleManualSubmit(e) {
+            e.preventDefault();
+            const val = document.getElementById('manualInput').value.trim();
+            if (!val) return;
+            processScannedMedicine(val);
+            document.getElementById('manualInput').value = '';
+            toggleClearBtn();
+        }
+
+        function processScannedMedicine(inputQuery) {
+            let foundBarcode = inputQuery;
+            let medData = medicineMap.get(inputQuery);
+
+            if (!medData) {
+                for (let [bc, item] of medicineMap.entries()) {
+                    if (item.name.toLowerCase().includes(inputQuery.toLowerCase())) {
+                        foundBarcode = bc;
+                        medData = item;
+                        break;
+                    }
+                }
+            }
+
+            const nameDisplay = medData ? medData.name : inputQuery;
+            const barcodeDisplay = medData ? foundBarcode : (Number.isInteger(Number(inputQuery)) ? inputQuery : "غير محدد");
+            const packagingDisplay = medData ? medData.packagingType : 'شريط حبوب';
+
+            Swal.fire({
+                title: 'تصنيف وتوجيه الدواء',
+                showCloseButton: true,
+                html: `
+                    <div class="text-right text-xs space-y-2 bg-slate-50 p-3 rounded border border-slate-200 mb-4 font-sans">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500 font-bold">اسم الدواء:</span>
+                            <span class="font-bold text-slate-900">${nameDisplay}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500 font-bold">الباركود:</span>
+                            <span class="font-mono bg-white px-2 py-0.5 rounded border border-slate-200">${barcodeDisplay}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500 font-bold">نوع العبوة:</span>
+                            <span class="font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">${packagingDisplay}</span>
+                        </div>
+                    </div>
+
+                    <p class="text-right text-xs font-bold text-slate-700 mb-2">اختر حالة الدواء الحالية:</p>
+                    <div class="space-y-2 text-right text-xs">
+                        <label class="flex items-center space-x-2 space-x-reverse p-3 border rounded cursor-pointer hover:bg-teal-50 hover:border-teal-400 transition">
+                            <input type="radio" name="medCondition" value="valid" class="text-teal-600 focus:ring-teal-500" checked>
+                            <div>
+                                <span class="font-bold text-slate-800 block">1. دواء مغلق وصالح للاستخدام</span>
+                                <span class="text-teal-600 text-[11px]">التوجيه: إعادة التوزيع الخيري للمرضى المحتاجين (+50 نقطة)</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center space-x-2 space-x-reverse p-3 border rounded cursor-pointer hover:bg-amber-50 hover:border-amber-400 transition">
+                            <input type="radio" name="medCondition" value="expired" class="text-amber-600 focus:ring-amber-500">
+                            <div>
+                                <span class="font-bold text-slate-800 block">2. دواء منتهي الصلاحية أو مفتوح</span>
+                                <span class="text-amber-600 text-[11px]">التوجيه: استخلاص المواد الفعالة (API) والتخلص الآمن (+20 نقطة)</span>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center space-x-2 space-x-reverse p-3 border rounded cursor-pointer hover:bg-purple-50 hover:border-purple-400 transition">
+                            <input type="radio" name="medCondition" value="empty" class="text-purple-600 focus:ring-purple-500">
+                            <div>
+                                <span class="font-bold text-slate-800 block">3. عبوة فارغة تماماً</span>
+                                <span class="text-purple-600 text-[11px]">التوجيه: إعادة تدوير العبوات والمواد البلاستيكية/المعدنية (+10 نقاط)</span>
+                            </div>
+                        </label>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'متابعة التوجيه <i class="fa-solid fa-arrow-left mr-1"></i>',
+                cancelButtonText: 'إلغاء التراجع',
+                confirmButtonColor: '#0f766e',
+                cancelButtonColor: '#64748b',
+                allowOutsideClick: false
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    const selectedCondition = document.querySelector('input[name="medCondition"]:checked').value;
+                    
+                    if (selectedCondition === 'valid') {
+                        commitTransaction(barcodeDisplay, nameDisplay, packagingDisplay, 'valid', 'إعادة التوزيع (Redistribution)', 50, 0, 0);
+                    } else {
+                        openDisposalGuidanceModal(barcodeDisplay, nameDisplay, packagingDisplay, selectedCondition);
+                    }
+                }
+            });
+        }
+
+        window.openExternalYoutubeVideo = function() {
+            window.open('https://www.youtube.com/watch?v=ILtd-_tfvyQ', '_blank', 'noopener,noreferrer');
+        };
+
+        function openDisposalGuidanceModal(barcode, name, packagingType, condition) {
+            let instructionsText = '';
+            
+            if (packagingType === 'شريط حبوب') {
+                instructionsText = 'أفرغ الأقراص التالفة في خضار/أتربة داخل كيس محكم الإغلاق قبل رميها في القمامة لمنع التسمم، وافصل شريط الألمنيوم/البلاستيك لإرساله لمصنع إعادة التدوير.';
+            } else if (packagingType === 'زجاجة شراب') {
+                instructionsText = 'يُحظر سكب الدواء السائل في حوض الصرف الصحي لمنع تلوث المياه الجوفية. اخلط السائل بمادة ماصة (تفل قهوة/تراب) في كيس مغلق، واغسل الزجاجة لإعادة التدوير.';
+            } else if (packagingType === 'أنبوبة مرهم') {
+                instructionsText = 'اعصر الأنبوبة جيداً للتخلص من المتبقي كنفايات داروية معالجة، وأودع الأنبوبة البلاستيكية/المعدنية في مستودع تدوير المواد الكيميائية.';
+            } else if (packagingType === 'حقنة معقمة') {
+                instructionsText = 'خطر بيولوجي: ألق السن والسرنجة فوراً في صندوق الأدوات الحادة (Sharps Box) لتفادي وخز عمال النظافة، ثم أرسل باقي الغلاف البلاستيكي للتدوير.';
+            } else if (packagingType === 'بخاخ طبي') {
+                instructionsText = 'تنبيه هام: يُمنع ثقب العبوة المضغوطة أو تعريضها للحرارة مطلقاً لتفادي الانفجار. ضع البخاخ في نقاط جمع النفايات المضغوطة المعتمدة.';
+            } else {
+                instructionsText = 'ضع المحتويات في كيس محكم وتخلص منها وفق إرشادات السلامة البيئية، وافصل الأغلفة الورقية والبلاستيكية للتعدين والتدوير.';
+            }
+
+            Swal.fire({
+                title: '<i class="fa-solid fa-shield-virus text-amber-500 ml-1"></i> إرشادات التخلص الآمن بروتوكول السلامة',
+                showCloseButton: true,
+                html: `
+                    <div class="text-right text-xs space-y-3 font-sans">
+                        <div class="flex items-center justify-between bg-slate-100 p-2.5 rounded border border-slate-200">
+                            <span class="font-bold text-slate-700">نوع العبوة والمادة:</span>
+                            <span class="bg-teal-700 text-white font-bold px-2.5 py-0.5 rounded">${packagingType}</span>
+                        </div>
+
+                        <div class="bg-amber-50 border-r-4 border-amber-500 p-3 rounded text-amber-900">
+                            <p class="font-bold text-xs mb-1"><i class="fa-solid fa-triangle-exclamation text-amber-600 ml-1"></i> تعليمات المعالجة والتخلص:</p>
+                            <p class="leading-relaxed text-[11px] font-medium">${instructionsText}</p>
+                        </div>
+
+                        <div class="space-y-2 mt-3">
+                            <p class="font-bold text-slate-800 text-xs"><i class="fa-brands fa-youtube text-red-600 ml-1"></i> فيديو إرشادي توضيحي للتخلص الآمن:</p>
+                            
+                            <div class="rounded border border-slate-300 overflow-hidden bg-black aspect-video relative">
+                                <iframe src="https://www.youtube.com/embed/ILtd-_tfvyQ" title="دليل التخلص الآمن من الأدوية" class="w-full h-44" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            </div>
+
+                            <div class="pt-2 text-center">
+                                <button type="button" onclick="openExternalYoutubeVideo()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 rounded text-xs transition flex items-center justify-center shadow-sm">
+                                    <i class="fa-brands fa-youtube text-sm ml-2"></i> مشاهدة الفيديو مباشرة على يوتيوب <i class="fa-solid fa-arrow-up-right-from-square text-[10px] mr-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                width: '600px',
+                confirmButtonText: 'تأكيد وقبول الإرشادات وتوجيه الشحنة <i class="fa-solid fa-circle-check mr-1"></i>',
+                confirmButtonColor: '#0f766e',
+                allowOutsideClick: false
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    if (condition === 'expired') {
+                        let apiVal = Math.floor(Math.random() * 15) + 5;
+                        commitTransaction(barcode, name, packagingType, 'expired', 'استخلاص كيميائي (API Extraction)', 20, apiVal, 0);
+                    } else {
+                        let plasticVal = Math.floor(Math.random() * 25) + 10;
+                        commitTransaction(barcode, name, packagingType, 'empty', 'إعادة تدوير العبوات (Packaging Recycling)', 10, 0, plasticVal);
+                    }
+                }
+            });
+        }
+
+        function commitTransaction(barcode, name, packagingType, conditionKey, routeText, pts, apiGrams, plasticGrams) {
+            let conditionText = conditionKey === 'valid' ? 'صالح ومغلق' : (conditionKey === 'expired' ? 'منتهي/مفتوح' : 'عبوة فارغة');
+
+            const logEntry = {
+                id: 'MC-' + Date.now().toString().slice(-6),
+                timestamp: new Date().toLocaleString('ar-EG'),
+                barcode: barcode,
+                name: name,
+                packagingType: packagingType,
+                conditionKey: conditionKey,
+                conditionText: conditionText,
+                routeText: routeText,
+                points: pts,
+                apiGrams: apiGrams,
+                plasticGrams: plasticGrams
+            };
+
+            appState.logs.unshift(logEntry);
+            appState.stats.totalProcessed++;
+            appState.stats.pointsEarned += pts;
+            appState.stats.apiReclaimedGrams += apiGrams;
+            appState.stats.packagingRecycledGrams += plasticGrams;
+
+            saveAppState();
+
+            Swal.fire({
+                title: 'تم تسجيل الشحنة بنجاح',
+                html: `
+                    <p class="text-xs text-slate-600 mb-2">تم توجيه الدواء لـ: <b>${routeText}</b></p>
+                    <span class="inline-block bg-teal-100 text-teal-800 font-extrabold px-3 py-1 rounded text-sm">+${pts} نقطة مضافة لرصيدك</span>
+                `,
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false,
+                showCloseButton: true
+            });
+        }
+
+        let chartRoutesObj = null;
+        let chartConditionsObj = null;
+        let currentPage = 1;
+        const rowsPerPage = 10;
+        let filteredLogs = [];
+
+        function renderUI() {
+            document.getElementById('statTotalProcessed').innerText = appState.stats.totalProcessed.toLocaleString('ar-EG');
+            document.getElementById('statPointsEarned').innerText = appState.stats.pointsEarned.toLocaleString('ar-EG');
+            document.getElementById('statApiReclaimed').innerText = appState.stats.apiReclaimedGrams.toLocaleString('ar-EG');
+            document.getElementById('statPackagingRecycled').innerText = appState.stats.packagingRecycledGrams.toLocaleString('ar-EG');
+
+            renderRewardsGrid();
+            updateCharts();
+            filterLogTable();
+        }
+
+        function updateCharts() {
+            let routeCounts = { 'إعادة التوزيع': 0, 'استخلاص كيميائي': 0, 'إعادة التدوير': 0 };
+            let conditionCounts = { 'صالح ومغلق': 0, 'منتهي/مفتوح': 0, 'عبوة فارغة': 0 };
+
+            appState.logs.forEach(item => {
+                if (item.conditionKey === 'valid') {
+                    routeCounts['إعادة التوزيع']++;
+                    conditionCounts['صالح ومغلق']++;
+                } else if (item.conditionKey === 'expired') {
+                    routeCounts['استخلاص كيميائي']++;
+                    conditionCounts['منتهي/مفتوح']++;
+                } else if (item.conditionKey === 'empty') {
+                    routeCounts['إعادة التدوير']++;
+                    conditionCounts['عبوة فارغة']++;
+                }
+            });
+
+            Chart.defaults.font.family = 'Tajawal';
+            Chart.defaults.color = '#475569';
+
+            const ctxR = document.getElementById('chartRoutes').getContext('2d');
+            if (chartRoutesObj) chartRoutesObj.destroy();
+            chartRoutesObj = new Chart(ctxR, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(routeCounts),
+                    datasets: [{
+                        data: Object.values(routeCounts),
+                        backgroundColor: ['#0d9488', '#d97706', '#9333ea'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } }
+                }
+            });
+
+            const ctxC = document.getElementById('chartConditions').getContext('2d');
+            if (chartConditionsObj) chartConditionsObj.destroy();
+            chartConditionsObj = new Chart(ctxC, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(conditionCounts),
+                    datasets: [{
+                        label: 'عدد الوحدات',
+                        data: Object.values(conditionCounts),
+                        backgroundColor: ['#0d9488', '#d97706', '#9333ea'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                }
+            });
+        }
+
+        function filterLogTable() {
+            const query = document.getElementById('tableSearchInput').value.toLowerCase();
+            filteredLogs = appState.logs.filter(item => 
+                item.name.toLowerCase().includes(query) ||
+                item.barcode.includes(query) ||
+                item.id.toLowerCase().includes(query) ||
+                item.packagingType.includes(query)
+            );
+            currentPage = 1;
+            renderLogTable();
+        }
+
+        function renderLogTable() {
+            const tbody = document.getElementById('logTableBody');
+            tbody.innerHTML = '';
+
+            if (filteredLogs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-6 text-center text-slate-400 font-bold">لا توجد عمليات مسجلة بالسجل حتى الآن.</td></tr>`;
+                document.getElementById('pageInfoText').innerText = 'عرض 0 من 0';
+                document.getElementById('btnPrevPage').disabled = true;
+                document.getElementById('btnNextPage').disabled = true;
+                return;
+            }
+
+            const totalPages = Math.ceil(filteredLogs.length / rowsPerPage);
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = Math.min(start + rowsPerPage, filteredLogs.length);
+            const pageData = filteredLogs.slice(start, end);
+
+            pageData.forEach(row => {
+                let badgeClass = row.conditionKey === 'valid' ? 'bg-teal-100 text-teal-800' : (row.conditionKey === 'expired' ? 'bg-amber-100 text-amber-800' : 'bg-purple-100 text-purple-800');
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+                tr.innerHTML = `
+                    <td class="p-3 font-mono font-bold text-slate-600">${row.id}</td>
+                    <td class="p-3 whitespace-nowrap text-slate-500 text-[11px]">${row.timestamp}</td>
+                    <td class="p-3 font-mono font-bold text-slate-900 bg-slate-50 rounded">${row.barcode}</td>
+                    <td class="p-3 font-bold text-slate-800">${row.name}</td>
+                    <td class="p-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-bold">${row.packagingType}</span></td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded font-bold ${badgeClass}">${row.conditionText}</span></td>
+                    <td class="p-3 font-bold text-slate-700">${row.routeText}</td>
+                    <td class="p-3 whitespace-nowrap">
+                        <span class="text-teal-700 font-bold">+${row.points} pt</span>
+                        ${row.apiGrams > 0 ? `<span class="text-amber-700 font-bold ml-1">/ ${row.apiGrams}g API</span>` : ''}
+                        ${row.plasticGrams > 0 ? `<span class="text-purple-700 font-bold ml-1">/ ${row.plasticGrams}g Rec</span>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('pageInfoText').innerText = `عرض ${start + 1} إلى ${end} من إجمالي ${filteredLogs.length}`;
+            document.getElementById('btnPrevPage').disabled = (currentPage === 1);
+            document.getElementById('btnNextPage').disabled = (currentPage === totalPages);
+        }
+
+        function changePage(dir) {
+            currentPage += dir;
+            renderLogTable();
+        }
+
+        function exportToCSV() {
+            if (appState.logs.length === 0) {
+                return Swal.fire({ title: 'تنبيه', text: 'لا يوجد بيانات مسجلة بالسجل لتصديرها.', icon: 'warning', showCloseButton: true });
+            }
+
+            let csvContent = "\uFEFFرقم الشحنة,التاريخ,الباركود,اسم الدواء,نوع العبوة,الحالة,المسار العكسي,النقاط,جرامات API,جرامات البلاستيك\n";
+            appState.logs.forEach(item => {
+                let line = [
+                    item.id,
+                    item.timestamp,
+                    item.barcode,
+                    `"${item.name.replace(/"/g, '""')}"`,
+                    item.packagingType,
+                    item.conditionText,
+                    `"${item.routeText}"`,
+                    item.points,
+                    item.apiGrams,
+                    item.plasticGrams
+                ];
+                csvContent += line.join(",") + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `MedCycle_Export_${Date.now()}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        window.onload = () => {
+            generateDatabase();
+            loadSavedState();
+            renderUI();
+        };
+    </script>
+</body>
+</html>
